@@ -1,9 +1,9 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
-export default function TabTwoScreen() {
+export default function FavoritosScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Aqui está a tela de explorar</Text>
+      <Text style={styles.text}>Tela de Favoritos</Text>
     </View>
   );
 }
@@ -13,9 +13,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#fff',
   },
   text: {
     fontSize: 18,
-    color: 'white',
+    fontWeight: '600',
   },
 });
