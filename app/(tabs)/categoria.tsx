@@ -1,8 +1,19 @@
-import React, { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { Image } from 'expo-image';
+import { useLocalSearchParams } from 'expo-router';
 
-export default function App() {
+export default function CategoriaScreen() {
+  const { categoria } = useLocalSearchParams();
+  const [categoriaSelecionada, setCategoriaSelecionada] = useState('Todos');
+
+  useEffect(() => {
+    if (categoria) {
+      setCategoriaSelecionada(categoria.toString());
+    }
+  }, [categoria]);
+
+  const categorias = ['Todos', 'Aventura', 'Ação', 'Esporte'];
 
   const jogos = [
     { 
@@ -28,17 +39,13 @@ export default function App() {
     }
   ];
 
-  const categorias = ['Todos', 'Ação', 'Esporte', 'Aventura'];
-
-  const [categoriaSelecionada, setCategoriaSelecionada] = useState('Todos');
-
   const jogosFiltrados =
     categoriaSelecionada === 'Todos'
       ? jogos
-      : jogos.filter(jogo => jogo.categoria === categoriaSelecionada);
+      : jogos.filter((jogo) => jogo.categoria === categoriaSelecionada);
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
 
       <View style={styles.categorias}>
         {categorias.map(cat => (
@@ -61,11 +68,10 @@ export default function App() {
         ))}
       </View>
 
-      <FlatList
-        data={jogosFiltrados}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
+      {/* GRID FLEX */}
+      <View style={styles.grid}>
+        {jogosFiltrados.map((item) => (
+          <View key={item.id} style={styles.card}>
 
             <Image
               source={{ uri: item.imagem }}
@@ -73,15 +79,17 @@ export default function App() {
               contentFit="cover"
             />
 
-            <Text style={styles.titulo}>{item.titulo}</Text>
-            <Text>{item.preco}</Text>
-            <Text style={styles.categoria}>{item.categoria}</Text>
+            <View style={styles.cardInfo}>
+              <Text style={styles.titulo}>{item.titulo}</Text>
+              <Text style={styles.preco}>{item.preco}</Text>
+              <Text style={styles.categoria}>{item.categoria}</Text>
+            </View>
 
           </View>
-        )}
-      />
+        ))}
+      </View>
 
-    </View>
+    </ScrollView>
   );
 }
 
@@ -108,27 +116,46 @@ const styles = StyleSheet.create({
     backgroundColor: '#007bff'
   },
 
+  // 🔥 GRID FLEX (igual web)
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between'
+  },
+
   card: {
-    backgroundColor: '#f5f5f5',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 15
+    width: '48%',
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    marginBottom: 15,
+    overflow: 'hidden',
+    elevation: 3
   },
 
   imagem: {
     width: '100%',
-    height: 140,
-    borderRadius: 10,
-    marginBottom: 10
+    height: 120
+  },
+
+  cardInfo: {
+    padding: 10
   },
 
   titulo: {
-    fontSize: 18,
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 5
+  },
+
+  preco: {
+    fontSize: 13,
+    color: '#007bff',
     fontWeight: 'bold'
   },
 
   categoria: {
-    marginTop: 5,
-    fontStyle: 'italic'
+    fontSize: 12,
+    color: '#777',
+    marginTop: 3
   }
 });

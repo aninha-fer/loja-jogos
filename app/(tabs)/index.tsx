@@ -3,8 +3,10 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Image } from 'expo-image';
 import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
+import { useRouter } from 'expo-router';
 
 export default function HomeScreen() {
+  const router = useRouter();
   const colorScheme = useColorScheme();
   const categorias = ['Ação', 'RPG', 'Estratégia', 'Terror', 'Aventura', 'Simulação', 'Esportes', 'Corrida', 'Puzzle'];
   const jogo = {
@@ -13,82 +15,84 @@ export default function HomeScreen() {
     avaliacao: '4.9',
     imagem: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6DKnP8m8EHbfT7f5L6ixqAvHiHQxxhFtkZg&s',
   };
-  return (
-    <ScrollView style={[styles.container, { backgroundColor: Colors[colorScheme ?? 'light'].background, flex: 1 }]} contentContainerStyle={{ paddingBottom: 100 }}> 
-      <View style={styles.divEsquerda}>
-        <Text style={styles.tituloCategoria}>Categorias</Text>
-        <FlatList
-          data={categorias}
-          keyExtractor={(item) => item}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoriaRow}
-          keyboardShouldPersistTaps="handled"
-          nestedScrollEnabled
-          directionalLockEnabled
-          decelerationRate="fast"
-          snapToInterval={110}
-          snapToAlignment="start"
-          renderItem={({ item }) => (
-            <Pressable style={styles.categoria} onPress={() => { /* ação */ }}>
-              <Text style={styles.categoriaText}>{item}</Text>
-            </Pressable>
-          )}
-        />
-      </View>
-      <View style={styles.divEsquerda}>
-        <Text style={styles.titulo}>Mais Vendidos</Text>
-        <Text style={styles.subtitulo}>Tendências globais hoje</Text>
-      </View>
-      <View style={styles.gridCards}>
-        <View style={styles.card}>
+return (
+  <ScrollView
+    style={[
+      styles.container,
+      {
+        backgroundColor: Colors[colorScheme ?? 'light'].background,
+        flex: 1,
+      },
+    ]}
+    contentContainerStyle={{ paddingBottom: 100 }}
+  >
+    <View style={styles.divEsquerda}>
+      <Text style={styles.tituloCategoria}>Categorias</Text>
+
+      <FlatList
+        data={categorias}
+        keyExtractor={(item) => item}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.categoriaRow}
+        keyboardShouldPersistTaps="handled"
+        nestedScrollEnabled
+        directionalLockEnabled
+        decelerationRate="fast"
+        snapToInterval={110}
+        snapToAlignment="start"
+        renderItem={({ item }) => (
+          <Pressable
+            style={styles.categoria}
+            onPress={() => router.push(`/categoria?categoria=${item}`)}
+          >
+            <Text style={styles.categoriaText}>{item}</Text>
+          </Pressable>
+        )}
+      />
+    </View>
+
+    <View style={styles.divEsquerda}>
+      <Text style={styles.titulo}>Mais Vendidos</Text>
+      <Text style={styles.subtitulo}>Tendências globais hoje</Text>
+    </View>
+
+    <View style={styles.gridCards}>
+      {[jogo, jogo, jogo].map((item, index) => (
+        <View key={index} style={styles.card}>
           <View style={styles.imgCard}>
-            <Image source={{ uri: jogo.imagem }} style={styles.imagem} contentFit="cover" />
+            <Image
+              source={{ uri: item.imagem }}
+              style={styles.imagem}
+              contentFit="cover"
+            />
           </View>
-          <Text style={styles.cardTitulo}>{jogo.titulo}</Text>
-          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text style={styles.cardPreco}>{jogo.preco}</Text>
+
+          <Text style={styles.cardTitulo}>{item.titulo}</Text>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Text style={styles.cardPreco}>{item.preco}</Text>
+
             <Text style={styles.cardAvaliacao}>
               <Svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                <Path d="M1.9125 9.5L2.725 5.9875L0 3.625L3.6 3.3125L5 0L6.4 3.3125L10 3.625L7.275 5.9875L8.0875 9.5L5 7.6375L1.9125 9.5V9.5" fill="#A3C9FF"/>
+                <Path
+                  d="M1.9125 9.5L2.725 5.9875L0 3.625L3.6 3.3125L5 0L6.4 3.3125L10 3.625L7.275 5.9875L8.0875 9.5L5 7.6375L1.9125 9.5V9.5"
+                  fill="#A3C9FF"
+                />
               </Svg>{' '}
-              {jogo.avaliacao}
+              {item.avaliacao}
             </Text>
           </View>
         </View>
-        <View style={styles.card}>
-          <View style={styles.imgCard}>
-            <Image source={{ uri: jogo.imagem }} style={styles.imagem} contentFit="cover" />
-          </View>
-          <Text style={styles.cardTitulo}>{jogo.titulo}</Text>
-          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text style={styles.cardPreco}>{jogo.preco}</Text>
-            <Text style={styles.cardAvaliacao}>
-              <Svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                <Path d="M1.9125 9.5L2.725 5.9875L0 3.625L3.6 3.3125L5 0L6.4 3.3125L10 3.625L7.275 5.9875L8.0875 9.5L5 7.6375L1.9125 9.5V9.5" fill="#A3C9FF"/>
-              </Svg>{' '}
-              {jogo.avaliacao}
-            </Text>
-          </View>
-        </View>
-        <View style={styles.card}>
-          <View style={styles.imgCard}>
-            <Image source={{ uri: jogo.imagem }} style={styles.imagem} contentFit="cover" />
-          </View>
-          <Text style={styles.cardTitulo}>{jogo.titulo}</Text>
-          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text style={styles.cardPreco}>{jogo.preco}</Text>
-            <Text style={styles.cardAvaliacao}>
-              <Svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                <Path d="M1.9125 9.5L2.725 5.9875L0 3.625L3.6 3.3125L5 0L6.4 3.3125L10 3.625L7.275 5.9875L8.0875 9.5L5 7.6375L1.9125 9.5V9.5" fill="#A3C9FF"/>
-              </Svg>{' '}
-              {jogo.avaliacao}
-            </Text>
-          </View>
-        </View>    
-      </View>
-    </ScrollView>
-  );
+      ))}
+    </View>
+  </ScrollView>
+);
 }
 
 const styles = StyleSheet.create({
