@@ -1,13 +1,13 @@
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Image } from 'expo-image';
+import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path, Polygon } from 'react-native-svg';
 
 export default function FavoritosScreen() {
   const colorScheme = useColorScheme();
-
-  const favoritos = [
+  const [favoritos, setFavoritos] = useState([
     {
       id: '1',
       titulo: 'Minecraft',
@@ -48,7 +48,15 @@ export default function FavoritosScreen() {
       imagem: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6DKnP8m8EHbfT7f5L6ixqAvHiHQxxhFtkZg&s',
       favoritado: true,
     },
-  ];
+  ]);
+
+  function toggleFavorito(id: string) {
+    setFavoritos((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, favoritado: !item.favoritado } : item
+      )
+    );
+  }
 
   return (
     <ScrollView
@@ -78,8 +86,8 @@ export default function FavoritosScreen() {
               </View>
             </View>
 
-            <Pressable style={styles.heartButton} onPress={() => { /* toggle favorito */ }}>
-              <Svg width="16" height="16" viewBox="0 0 24 24" fill={jogo.favoritado ? '#A3C9FF' : 'none'} stroke="#A3C9FF" strokeWidth="2">
+            <Pressable style={styles.heartButton} onPress={() => toggleFavorito(jogo.id)}>
+              <Svg width="16" height="16" viewBox="0 0 24 24" fill={jogo.favoritado ? '#ffffff' : 'none'} stroke="#ffffff" strokeWidth="2">
                 <Path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
               </Svg>
             </Pressable>
