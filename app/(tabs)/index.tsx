@@ -1,98 +1,50 @@
+import Card from '@/components/card';
+import CarrosselCategorias from '@/components/carrossel-categorias';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Image } from 'expo-image';
-import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
 import { useRouter } from 'expo-router';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import Svg, { Polygon } from 'react-native-svg';
 
 export default function HomeScreen() {
   const router = useRouter();
   const colorScheme = useColorScheme();
-  const categorias = ['Ação', 'RPG', 'Estratégia', 'Terror', 'Aventura', 'Simulação', 'Esportes', 'Corrida', 'Puzzle'];
+  const categorias = ['Ação', 'RPG', 'Estratégia', 'Terror', 'Aventura', 'Simulação', 'Esporte', 'Corrida', 'Puzzle'];
   const jogo = {
     titulo: 'Minecraft',
     preco: 'R$ 199,90',
     avaliacao: '4.9',
+    descricao: 'Minecraft é um jogo de construção e aventura onde os jogadores podem explorar um mundo, coletar recursos, construir estruturas e enfrentar criaturas.',
     imagem: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6DKnP8m8EHbfT7f5L6ixqAvHiHQxxhFtkZg&s',
   };
-return (
-  <ScrollView
-    style={[
-      styles.container,
-      {
-        backgroundColor: Colors[colorScheme ?? 'light'].background,
-        flex: 1,
-      },
-    ]}
-    contentContainerStyle={{ paddingBottom: 100 }}
-  >
-    <View style={styles.divEsquerda}>
-      <Text style={styles.tituloCategoria}>Categorias</Text>
-
-      <FlatList
-        data={categorias}
-        keyExtractor={(item) => item}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.categoriaRow}
-        keyboardShouldPersistTaps="handled"
-        nestedScrollEnabled
-        directionalLockEnabled
-        decelerationRate="fast"
-        snapToInterval={110}
-        snapToAlignment="start"
-        renderItem={({ item }) => (
-          <Pressable
-            style={styles.categoria}
-            onPress={() => router.push(`/categoria?categoria=${item}`)}
-          >
-            <Text style={styles.categoriaText}>{item}</Text>
+  return (
+    <ScrollView style={[styles.container, { backgroundColor: Colors[colorScheme ?? 'light'].background, flex: 1 }]} contentContainerStyle={{ paddingBottom: 100 }}> 
+      <View style={styles.destaqueSemana}>
+        <Image source={{ uri: jogo.imagem }} style={styles.destaqueImagem} contentFit="cover" />
+        <View style={styles.destaqueOverlay} />
+        <View style={styles.destaqueContent}>
+          <Text style={styles.tituloDestaque}>Destaque da Semana</Text>
+          <Text style={styles.titulo}>{jogo.titulo}</Text>
+          <Text style={styles.descricao}>{jogo.descricao}</Text>
+          <Pressable style={styles.jogarButton} onPress={() => { /* ação jogar */ }}>
+            <Svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+              <Polygon points="2,1 9,5 2,9" fill="#002A51" />
+            </Svg>
+            <Text style={styles.jogarText}>JOGAR</Text>
           </Pressable>
-        )}
-      />
-    </View>
-
-    <View style={styles.divEsquerda}>
-      <Text style={styles.titulo}>Mais Vendidos</Text>
-      <Text style={styles.subtitulo}>Tendências globais hoje</Text>
-    </View>
-
-    <View style={styles.gridCards}>
-      {[jogo, jogo, jogo].map((item, index) => (
-        <View key={index} style={styles.card}>
-          <View style={styles.imgCard}>
-            <Image
-              source={{ uri: item.imagem }}
-              style={styles.imagem}
-              contentFit="cover"
-            />
-          </View>
-
-          <Text style={styles.cardTitulo}>{item.titulo}</Text>
-
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}
-          >
-            <Text style={styles.cardPreco}>{item.preco}</Text>
-
-            <Text style={styles.cardAvaliacao}>
-              <Svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                <Path
-                  d="M1.9125 9.5L2.725 5.9875L0 3.625L3.6 3.3125L5 0L6.4 3.3125L10 3.625L7.275 5.9875L8.0875 9.5L5 7.6375L1.9125 9.5V9.5"
-                  fill="#A3C9FF"
-                />
-              </Svg>{' '}
-              {item.avaliacao}
-            </Text>
-          </View>
         </View>
-      ))}
-    </View>
-  </ScrollView>
-);
+      </View>
+      <CarrosselCategorias categorias={categorias} selecionavel={false}/>
+      <View style={styles.divEsquerda}>
+        <Text style={styles.titulo}>Mais Vendidos</Text>
+        <Text style={styles.subtitulo}>Tendências globais hoje</Text>
+      </View>
+      <View style={styles.gridCards}>
+        <Card jogo={jogo}/>
+      </View>
+    </ScrollView>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -103,34 +55,6 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     margin: 20,
-  },
-  categoriaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-  },
-  tituloCategoria: {
-      fontSize: 20,
-      color: '#A3C9FF',
-      textTransform: 'uppercase',
-      fontWeight: '600',
-      letterSpacing: 0.6, 
-  },
-  categoria: {
-    backgroundColor: '#272A31',
-    height: 40,
-    minWidth: 100,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(64, 71, 83, 0.10)',
-    borderStyle: 'solid',
-    justifyContent: 'center',
-    alignItems: 'center',  
-    marginRight: 10,
-  },
-  categoriaText: {
-    color: '#E1E2EB',
   },
   titulo: {
     color: '#E1E2EB',
@@ -154,41 +78,74 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     rowGap: 20,
   },
-  card: {
-    backgroundColor: '#191C22',
-    height: 300,
-    width: 165,
+  destaqueSemana: {
+    height: 400,
     borderRadius: 16,
-    
-  },
-  imgCard: {
-    // backgroundColor: 'red',
-    height: 200,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    margin: 20,
+    position: 'relative',
     overflow: 'hidden',
+    backgroundColor: '#020617',
   },
-  imagem: {
+  destaqueImagem: {
     width: '100%',
     height: '100%',
+    position: 'absolute',
+    top: 0,
+    left: 0,
   },
-  cardTitulo: {
+  destaqueOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+  },
+  destaqueContent: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+    right: 20,
+    bottom: 20,
+    gap: 5,
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+  },
+  descricao: {
     color: '#E1E2EB',
-    fontSize: 18,
-    fontWeight: '700',
-    margin: 10,
-    textTransform: 'uppercase',
-  },
-  cardPreco: {
-    color: '#A3C9FF',
     fontSize: 12,
-    fontWeight: '700',
-    margin: 10,
+    letterSpacing: 1.2,
+    marginTop: 12,
   },
-  cardAvaliacao: {
-    color: '#A3C9FF',
+  jogarButton: {
+    backgroundColor: '#A3C9FF',
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    width: 110,
+  },
+  jogarText: {
+    color: '#002A51',
     fontSize: 10,
     fontWeight: '700',
-    margin: 10,
+    letterSpacing: 0.8,
   },
+  tituloDestaque: {
+    backgroundColor: 'rgba(163, 201, 255, 0.15)',
+    width: 200,
+    paddingHorizontal: 5,
+    paddingVertical: 4,
+    fontSize: 10,
+    borderRadius: 50,
+    textTransform: 'uppercase',
+    color: '#A3C9FF',
+    fontWeight: '700',
+    letterSpacing: 1.2,
+    textAlign: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(163, 201, 255, 0.3)',
+  }
 });
