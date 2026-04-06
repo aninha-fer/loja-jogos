@@ -1,6 +1,7 @@
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Image } from 'expo-image';
+import { router } from "expo-router";
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path, Polygon } from 'react-native-svg';
@@ -70,7 +71,21 @@ export default function FavoritosScreen() {
 
       <View style={styles.lista}>
         {favoritos.map((jogo) => (
-          <View key={jogo.id} style={styles.card}>
+        <Pressable
+          key={jogo.id}
+          style={styles.card}
+          onPress={() =>
+            router.push({
+            pathname: "/game/[id]" as any,
+            params: {
+              id: jogo.id,
+              titulo: jogo.titulo,
+              imagem: jogo.imagem,
+              info: jogo.info,
+          },
+        })
+      }
+    >
             <View style={styles.imgCard}>
               <Image source={{ uri: jogo.imagem }} style={styles.imagem} contentFit="cover" />
             </View>
@@ -98,7 +113,7 @@ export default function FavoritosScreen() {
               </Svg>
               <Text style={styles.jogarText}>JOGAR</Text>
             </Pressable>
-          </View>
+          </Pressable>
         ))}
       </View>
     </ScrollView>
