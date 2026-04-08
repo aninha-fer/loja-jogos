@@ -12,6 +12,7 @@ export default function TabLayout() {
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors[colorScheme ?? 'light'].background }}>
+      
       <FixedHeader />
       <Tabs
         screenOptions={{
@@ -48,7 +49,9 @@ export default function TabLayout() {
             tabBarIcon: ({ color }) => <IconSymbol size={28} name="heart.fill" color={color} />,
           }}
         />
+        
       </Tabs>
     </View>
+    
   );
 }
