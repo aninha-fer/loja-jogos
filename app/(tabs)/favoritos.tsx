@@ -76,14 +76,14 @@ export default function FavoritosScreen() {
           style={styles.card}
           onPress={() =>
             router.push({
-            pathname: "/game/[id]" as any,
+            pathname: '/tela-jogo',
             params: {
               id: jogo.id,
               titulo: jogo.titulo,
               imagem: jogo.imagem,
               info: jogo.info,
           },
-        })
+        } as any)
       }
     >
             <View style={styles.imgCard}>
