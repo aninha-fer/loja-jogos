@@ -2,15 +2,45 @@ import Card from '@/components/card';
 import CarrosselCategorias from '@/components/carrossel-categorias';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import axios from 'axios';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Svg, { Polygon } from 'react-native-svg';
+
+type Jogo = {
+  titulo: string;
+  descricao: string;
+  preco: number;
+  genero: string;
+  dataLancamento: string;
+  tamanho: number;
+  capa: string;
+  idadeMinima: number;
+};
 
 export default function HomeScreen() {
   const router = useRouter();
   const colorScheme = useColorScheme();
-  const categorias = ['Ação', 'RPG', 'Estratégia', 'Terror', 'Aventura', 'Simulação', 'Esporte', 'Corrida', 'Puzzle'];
+  const [data, setData] = useState<Jogo[]>([]);
+
+  const categorias = ['acao', 'RPG', 'sobrevivencia', 'aventura', 'esporte'];
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await axios.get('https://projeto-steam.vercel.app/jogos');
+        setData(response.data); 
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    fetchData();
+  }, []);
+
+
+
   const jogo = {
     titulo: 'Minecraft',
     preco: 'R$ 199,90',
@@ -41,7 +71,9 @@ export default function HomeScreen() {
         <Text style={styles.subtitulo}>Tendências globais hoje</Text>
       </View>
       <View style={styles.gridCards}>
-        <Card jogo={jogo}/>
+        {data.map((jogo, index) => (
+          <Card key={index} jogo={jogo} />
+        ))}
       </View>
     </ScrollView>
   );

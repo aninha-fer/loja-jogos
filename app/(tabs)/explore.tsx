@@ -1,12 +1,38 @@
 import Card from '@/components/card';
 import CarrosselCategorias from '@/components/carrossel-categorias';
+import axios from 'axios';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
+type Jogo = {
+  id: number;
+  titulo: string;
+  descricao: string;
+  preco: number;
+  genero: string;
+  dataLancamento: string;
+  tamanho: number;
+  capa: string;
+  idadeMinima: number;
+};
+
 export default function CategoriaScreen() {
   const { categoria } = useLocalSearchParams();
   const [categoriaSelecionada, setCategoriaSelecionada] = useState('Todos');
+  const [jogos, setJogos] = useState<Jogo[]>([]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await axios.get('https://projeto-steam.vercel.app/jogos');
+        setJogos(response.data); 
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    fetchData();
+  }, []);
 
   useEffect(() => {
     if (categoria) {
@@ -14,36 +40,12 @@ export default function CategoriaScreen() {
     }
   }, [categoria]);
 
-  const categorias = ['Todos','Ação', 'RPG', 'Estratégia', 'Terror', 'Aventura', 'Simulação', 'Esporte', 'Corrida', 'Puzzle'];
-
-  const jogos = [
-    { 
-      id: '1', 
-      titulo: 'Minecraft', 
-      preco: 'R$ 199,90', 
-      categoria: 'Aventura',
-      imagem: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6DKnP8m8EHbfT7f5L6ixqAvHiHQxxhFtkZg&s'
-    },
-    { 
-      id: '2',
-      titulo: 'FIFA 24',
-      preco: 'R$ 299,90',
-      categoria: 'Esporte',
-      imagem: 'https://www.centralxbox.com.br/wp-content/uploads/2023/10/f1.jpeg'
-    },
-    { 
-      id: '3',
-      titulo: 'Call of Duty',
-      preco: 'R$ 249,90',
-      categoria: 'Ação',
-      imagem: 'https://upload.wikimedia.org/wikipedia/pt/8/8b/Call_of_Duty_Modern_Warfare_3_capa.png'
-    }
-  ];
+  const categorias = ['Todos', 'acao', 'RPG', 'sobrevivencia', 'aventura', 'esporte'];
 
   const jogosFiltrados =
     categoriaSelecionada === 'Todos'
       ? jogos
-      : jogos.filter((jogo) => jogo.categoria === categoriaSelecionada);
+      : jogos.filter((jogo) => jogo.genero === categoriaSelecionada);
 
   return (
     <ScrollView style={styles.container}>

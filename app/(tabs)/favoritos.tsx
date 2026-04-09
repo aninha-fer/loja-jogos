@@ -1,62 +1,73 @@
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import axios from 'axios';
 import { Image } from 'expo-image';
 import { router } from "expo-router";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path, Polygon } from 'react-native-svg';
 
+type Jogo = {
+  id: number;
+  titulo: string;
+  descricao: string;
+  preco: number;
+  genero: string;
+  dataLancamento: string;
+  tamanho: number;
+  capa: string;
+  idadeMinima: number;
+};
+
 export default function FavoritosScreen() {
   const colorScheme = useColorScheme();
-  const [favoritos, setFavoritos] = useState([
-    {
-      id: '1',
-      titulo: 'Minecraft',
-      categorias: ['RPG DE AÇÃO'],
-      info: '',
-      imagem: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6DKnP8m8EHbfT7f5L6ixqAvHiHQxxhFtkZg&s',
-      favoritado: true,
-    },
-    {
-      id: '2',
-      titulo: 'Minecraft',
-      categorias: ['SIMULAÇÃO', 'ESPACIAL'],
-      info: '',
-      imagem: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6DKnP8m8EHbfT7f5L6ixqAvHiHQxxhFtkZg&s',
-      favoritado: true,
-    },
-    {
-      id: '3',
-      titulo: 'Minecraft',
-      categorias: ['FANTASIA DARK'],
-      info: '',
-      imagem: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6DKnP8m8EHbfT7f5L6ixqAvHiHQxxhFtkZg&s',
-      favoritado: true,
-    },
-    {
-      id: '4',
-      titulo: 'Minecraft',
-      categorias: ['CORRIDA ARCADE'],
-      info: '',
-      imagem: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6DKnP8m8EHbfT7f5L6ixqAvHiHQxxhFtkZg&s',
-      favoritado: true,
-    },
-    {
-      id: '5',
-      titulo: 'Minecraft',
-      categorias: ['INDIE ADVENTURE'],
-      info: '',
-      imagem: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6DKnP8m8EHbfT7f5L6ixqAvHiHQxxhFtkZg&s',
-      favoritado: true,
-    },
-  ]);
+  const [favoritos, setFavoritos] = useState<Jogo[]>([]);
 
-  function toggleFavorito(id: string) {
-    setFavoritos((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, favoritado: !item.favoritado } : item
-      )
-    );
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await axios.get('https://projeto-steam.vercel.app/favoritos');
+        console.log('Resposta da API favoritos:', response.data);
+        // A API retorna um objeto agrupado por título, transformar em array
+        const favoritosObj = response.data;
+        const favoritosArray = Object.values(favoritosObj).flat() as Jogo[];
+        console.log('favoritosArray:', favoritosArray);
+        if (Array.isArray(favoritosArray)) {
+          setFavoritos(favoritosArray);
+        } else {
+          console.error('favoritosArray não é array:', favoritosArray);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar favoritos:', error);
+      }
+    }
+    fetchData();
+  }, []);
+
+
+  async function toggleFavorito(titulo: string) {
+    try {
+      const response = await fetch('https://projeto-steam.vercel.app/remover-favorito', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          titulo: titulo
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erro na requisição: ${response.status} ${response.statusText}`);
+      }
+
+      const json = await response.json();
+      console.log('Removido dos favoritos:', json);
+      // Atualizar a lista removendo o item
+      setFavoritos((prev) => prev.filter((jogo) => jogo.titulo !== titulo));
+    } catch (error) {
+      console.error('Erro ao remover favorito:', error);
+    }
   }
 
   return (
@@ -70,7 +81,7 @@ export default function FavoritosScreen() {
       </View>
 
       <View style={styles.lista}>
-        {favoritos.map((jogo) => (
+        {favoritos && favoritos.map((jogo) => (
         <Pressable
           key={jogo.id}
           style={styles.card}
@@ -80,29 +91,27 @@ export default function FavoritosScreen() {
             params: {
               id: jogo.id,
               titulo: jogo.titulo,
-              imagem: jogo.imagem,
-              info: jogo.info,
+              capa: jogo.capa,
+              descricao: jogo.descricao,
           },
         } as any)
       }
     >
             <View style={styles.imgCard}>
-              <Image source={{ uri: jogo.imagem }} style={styles.imagem} contentFit="cover" />
+              <Image source={{ uri: jogo.capa }} style={styles.imagem} contentFit="cover" />
             </View>
 
             <View style={styles.cardInfo}>
               <Text style={styles.cardTitulo}>{jogo.titulo}</Text>
               <View style={styles.categoriasRow}>
-                {jogo.categorias.map((cat, index) => (
-                  <Text key={index} style={styles.categoriaText}>{cat}</Text>
-                ))}
+                <Text style={styles.categoriaText}>{jogo.genero}</Text>
                 <Text style={styles.dot}>·</Text>
-                <Text style={styles.infoText}>{jogo.info}</Text>
+                <Text style={styles.infoText}>{jogo.descricao}</Text>
               </View>
             </View>
 
-            <Pressable style={styles.heartButton} onPress={() => toggleFavorito(jogo.id)}>
-              <Svg width="16" height="16" viewBox="0 0 24 24" fill={jogo.favoritado ? '#ffffff' : 'none'} stroke="#ffffff" strokeWidth="2">
+            <Pressable style={styles.heartButton} onPress={() => toggleFavorito(jogo.titulo)}>
+              <Svg width="16" height="16" viewBox="0 0 24 24" fill={'#ffffff'} stroke="#ffffff" strokeWidth="2">
                 <Path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
               </Svg>
             </Pressable>
