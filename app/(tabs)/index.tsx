@@ -21,7 +21,6 @@ type Jogo = {
 };
 
 export default function HomeScreen() {
-  const router = useRouter();
   const colorScheme = useColorScheme();
   const [data, setData] = useState<Jogo[]>([]);
 
@@ -39,19 +38,17 @@ export default function HomeScreen() {
     fetchData();
   }, []);
 
-
-
   const jogo = {
     titulo: 'Minecraft',
     preco: 'R$ 199,90',
     avaliacao: '4.9',
     descricao: 'Minecraft é um jogo de construção e aventura onde os jogadores podem explorar um mundo, coletar recursos, construir estruturas e enfrentar criaturas.',
-    imagem: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6DKnP8m8EHbfT7f5L6ixqAvHiHQxxhFtkZg&s',
+    capa: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6DKnP8m8EHbfT7f5L6ixqAvHiHQxxhFtkZg&s',
   };
   return (
     <ScrollView style={[styles.container, { backgroundColor: Colors[colorScheme ?? 'light'].background, flex: 1 }]} contentContainerStyle={{ paddingBottom: 100 }}> 
       <View style={styles.destaqueSemana}>
-        <Image source={{ uri: jogo.imagem }} style={styles.destaqueImagem} contentFit="cover" />
+        <Image source={{ uri: jogo.capa }} style={styles.destaqueImagem} contentFit="cover" />
         <View style={styles.destaqueOverlay} />
         <View style={styles.destaqueContent}>
           <Text style={styles.tituloDestaque}>Destaque da Semana</Text>

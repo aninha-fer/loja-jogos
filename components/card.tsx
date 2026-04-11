@@ -4,7 +4,18 @@ import { useEffect, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
 
-export default function Card({ jogo }: { jogo: any }) {
+type Jogo = {
+  titulo: string;
+  descricao: string;
+  preco: number;
+  genero: string;
+  dataLancamento: string;
+  tamanho: number;
+  capa: string;
+  idadeMinima: number;
+};
+
+export default function Card({ jogo }: { jogo: Jogo }) {
     const [favoritado, setFavoritado] = useState(false);
     const router = useRouter();
 
@@ -82,9 +93,13 @@ export default function Card({ jogo }: { jogo: any }) {
             pathname: '/tela-jogo',
             params: {
                 titulo: jogo.titulo,
-                imagem: jogo.capa,
-                info: jogo.descricao,
-                categorias: jogo.categorias?.join('|') || '',
+                capa: jogo.capa,
+                descricao: jogo.descricao,
+                categorias: jogo.genero,
+                preco: jogo.preco,
+                dataLancamento: jogo.dataLancamento,
+                tamanho: jogo.tamanho,
+                idadeMinima: jogo.idadeMinima,
             },
         } as any);
     }
@@ -103,12 +118,12 @@ export default function Card({ jogo }: { jogo: any }) {
                 <Text style={styles.cardTitulo}>{jogo.titulo}</Text>
                 <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
                     <Text style={styles.cardPreco}>R$ {jogo.preco}</Text>
-                    <Text style={styles.cardAvaliacao}>
+                    {/* <Text style={styles.cardAvaliacao}>
                         <Svg width="10" height="10" viewBox="0 0 10 10" fill="none">
                         <Path d="M1.9125 9.5L2.725 5.9875L0 3.625L3.6 3.3125L5 0L6.4 3.3125L10 3.625L7.275 5.9875L8.0875 9.5L5 7.6375L1.9125 9.5V9.5" fill="#ffffff"/>
                         </Svg>{' '}
                         {jogo.avaliacao}
-                    </Text>
+                    </Text> */}
                 </View>
             </View>
         </Pressable>

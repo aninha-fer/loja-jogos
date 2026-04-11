@@ -8,16 +8,19 @@ export default function GameDetailsScreen() {
   const params = useLocalSearchParams();
 
   const titulo = String(params.titulo ?? "Jogo");
-  const imagem = String(params.imagem ?? "");
-  const info = String(params.info ?? "Sem descrição disponível.");
-  const categorias = String(params.categorias ?? "")
-    .split("|")
-    .filter(Boolean);
+  const capa = String(params.capa ?? "");
+  const descricao = String(params.descricao ?? "");
+  const preco = Number(params.preco ?? 0);
+  const genero = String(params.genero ?? "");
+  const dataLancamento = String(params.dataLancamento ?? "");
+  const tamanho = Number(params.tamanho ?? 0);
+  const idadeMinima = Number(params.idadeMinima ?? 0);
+  const categorias = genero ? [genero] : [];
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Stack.Screen options={{ headerShown: false }} />
-      <Image source={{ uri: imagem }} style={styles.banner} contentFit="cover" />
+      <Image source={{ uri: capa }} style={styles.banner} contentFit="cover" />
 
 
       <View style={styles.header}>
@@ -40,23 +43,23 @@ export default function GameDetailsScreen() {
 
         <View style={styles.infoGrid}>
           <View style={styles.infoCard}>
-            <Text style={styles.infoLabel}>AVALIAÇÃO</Text>
-            <Text style={styles.infoValue}>4.8/5.0</Text>
+            <Text style={styles.infoLabel}>PREÇO</Text>
+            <Text style={styles.infoValue}>R$ {preco.toFixed(2)}</Text>
           </View>
 
           <View style={styles.infoCard}>
             <Text style={styles.infoLabel}>TAMANHO</Text>
-            <Text style={styles.infoValue}>84 GB</Text>
+            <Text style={styles.infoValue}>{tamanho} GB</Text>
           </View>
 
           <View style={styles.infoCard}>
             <Text style={styles.infoLabel}>IDADE</Text>
-            <Text style={styles.infoValue}>16+</Text>
+            <Text style={styles.infoValue}>{idadeMinima}+</Text>
           </View>
 
           <View style={styles.infoCard}>
             <Text style={styles.infoLabel}>LANÇAMENTO</Text>
-            <Text style={styles.infoValue}>2024</Text>
+            <Text style={styles.infoValue}>{dataLancamento}</Text>
           </View>
         </View>
 
@@ -66,7 +69,7 @@ export default function GameDetailsScreen() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Sobre o Jogo</Text>
-          <Text style={styles.description}>{info}</Text>
+          <Text style={styles.description}>{descricao}</Text>
         </View>
 
         <View style={styles.section}>

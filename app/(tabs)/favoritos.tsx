@@ -21,24 +21,34 @@ type Jogo = {
 
 export default function FavoritosScreen() {
   const colorScheme = useColorScheme();
-  const [favoritos, setFavoritos] = useState<Jogo[]>([]);
+  const [favoritos, setFavoritos] = useState<string[]>([]);
+  const [jogo, setJogo] = useState<Jogo[]>([]);
 
   useEffect(() => {
     async function fetchData() {
       try {
         const response = await axios.get('https://projeto-steam.vercel.app/favoritos');
-        console.log('Resposta da API favoritos:', response.data);
-        // A API retorna um objeto agrupado por título, transformar em array
         const favoritosObj = response.data;
-        const favoritosArray = Object.values(favoritosObj).flat() as Jogo[];
-        console.log('favoritosArray:', favoritosArray);
+        const favoritosArray = Object.values(favoritosObj).flat() as { titulo: string }[];
         if (Array.isArray(favoritosArray)) {
-          setFavoritos(favoritosArray);
+          setFavoritos(favoritosArray.map(f => f.titulo));
         } else {
-          console.error('favoritosArray não é array:', favoritosArray);
+          console.error('favoritos não é array:', favoritosArray);
         }
       } catch (error) {
         console.error('Erro ao buscar favoritos:', error);
+      }
+    }
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await axios.get('https://projeto-steam.vercel.app/jogos');
+        setJogo(response.data); 
+      } catch (error) {
+        console.error(error);
       }
     }
     fetchData();
@@ -63,7 +73,6 @@ export default function FavoritosScreen() {
 
       const json = await response.json();
       console.log('Removido dos favoritos:', json);
-      // Atualizar a lista removendo o item
       setFavoritos((prev) => prev.filter((jogo) => jogo.titulo !== titulo));
     } catch (error) {
       console.error('Erro ao remover favorito:', error);
@@ -81,36 +90,42 @@ export default function FavoritosScreen() {
       </View>
 
       <View style={styles.lista}>
-        {favoritos && favoritos.map((jogo) => (
+        {favoritos && favoritos.map((titulo) => {
+          const jogoItem = jogo.find(j => j.titulo === titulo);
+          if (!jogoItem) return null;
+          return (
         <Pressable
-          key={jogo.id}
+          key={jogoItem.id}
           style={styles.card}
           onPress={() =>
             router.push({
             pathname: '/tela-jogo',
             params: {
-              id: jogo.id,
-              titulo: jogo.titulo,
-              capa: jogo.capa,
-              descricao: jogo.descricao,
+              id: jogoItem.id,
+              titulo: jogoItem.titulo,
+              capa: jogoItem.capa,
+              descricao: jogoItem.descricao,
+              preco: jogoItem.preco,
+              genero: jogoItem.genero,
+              dataLancamento: jogoItem.dataLancamento,
+              tamanho: jogoItem.tamanho,
+              idadeMinima: jogoItem.idadeMinima,
           },
         } as any)
       }
     >
             <View style={styles.imgCard}>
-              <Image source={{ uri: jogo.capa }} style={styles.imagem} contentFit="cover" />
+              <Image source={{ uri: jogoItem.capa }} style={styles.imagem} contentFit="cover" />
             </View>
 
             <View style={styles.cardInfo}>
-              <Text style={styles.cardTitulo}>{jogo.titulo}</Text>
+              <Text style={styles.cardTitulo}>{jogoItem.titulo}</Text>
               <View style={styles.categoriasRow}>
-                <Text style={styles.categoriaText}>{jogo.genero}</Text>
-                <Text style={styles.dot}>·</Text>
-                <Text style={styles.infoText}>{jogo.descricao}</Text>
+                <Text style={styles.categoriaText}>{jogoItem.genero}</Text>
               </View>
             </View>
 
-            <Pressable style={styles.heartButton} onPress={() => toggleFavorito(jogo.titulo)}>
+            <Pressable style={styles.heartButton} onPress={() => toggleFavorito(jogoItem.titulo)}>
               <Svg width="16" height="16" viewBox="0 0 24 24" fill={'#ffffff'} stroke="#ffffff" strokeWidth="2">
                 <Path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
               </Svg>
@@ -123,7 +138,8 @@ export default function FavoritosScreen() {
               <Text style={styles.jogarText}>JOGAR</Text>
             </Pressable>
           </Pressable>
-        ))}
+          );
+        })}
       </View>
     </ScrollView>
   );
@@ -201,10 +217,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 0.8,
     textTransform: 'uppercase',
-  },
-  dot: {
-    color: '#A3C9FF',
-    fontSize: 9,
   },
   infoText: {
     color: '#6B7280',
