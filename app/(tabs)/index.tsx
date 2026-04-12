@@ -6,7 +6,7 @@ import axios from 'axios';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Svg, { Polygon } from 'react-native-svg';
 
 type Jogo = {
@@ -54,7 +54,7 @@ export default function HomeScreen() {
           <Text style={styles.tituloDestaque}>Destaque da Semana</Text>
           <Text style={styles.titulo}>{jogo.titulo}</Text>
           <Text style={styles.descricao}>{jogo.descricao}</Text>
-          <Pressable style={styles.jogarButton} onPress={() => { /* ação jogar */ }}>
+          <Pressable style={styles.jogarButton} onPress={() => { Alert.alert('Download', 'Iniciando download...') }}>
             <Svg width="10" height="10" viewBox="0 0 10 10" fill="none">
               <Polygon points="2,1 9,5 2,9" fill="#002A51" />
             </Svg>

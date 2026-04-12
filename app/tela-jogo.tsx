@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { router, Stack, useLocalSearchParams } from "expo-router";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 
 
@@ -63,7 +63,7 @@ export default function GameDetailsScreen() {
           </View>
         </View>
 
-        <Pressable style={styles.downloadButton}>
+        <Pressable style={styles.downloadButton} onPress={() => { Alert.alert('Download', 'Iniciando download...') }}>
           <Text style={styles.downloadText}>BAIXAR AGORA</Text>
         </Pressable>
 

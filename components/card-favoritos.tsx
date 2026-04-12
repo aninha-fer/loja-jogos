@@ -2,9 +2,10 @@ import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
-import Svg, { Path } from "react-native-svg";
+import Svg, { Path, Polygon } from "react-native-svg";
 
 type Jogo = {
+  id: number;
   titulo: string;
   descricao: string;
   preco: number;
@@ -15,27 +16,9 @@ type Jogo = {
   idadeMinima: number;
 };
 
-export default function Card({ jogo }: { jogo: Jogo }) {
-    const [favoritado, setFavoritado] = useState(false);
+export default function CardFavoritos({ jogo }: { jogo: Jogo }) {
+    const [favoritado, setFavoritado] = useState(true);
     const router = useRouter();
-
-    useEffect(() => {
-        const verificarFavorito = async () => {
-            try {
-                const response = await fetch('https://projeto-steam.vercel.app/favoritos');
-                if (!response.ok) {
-                    throw new Error(`Erro na requisição: ${response.status}`);
-                }
-                const favoritos = await response.json();
-                const isFavoritado = favoritos[jogo.titulo] && Array.isArray(favoritos[jogo.titulo]) && favoritos[jogo.titulo].length > 0;
-                setFavoritado(isFavoritado);
-            } catch (error) {
-                console.error('Erro ao verificar favorito:', error);
-                setFavoritado(false);
-            }
-        };
-        verificarFavorito();
-    }, [jogo.titulo]);
 
     const toggleFavorito = async () => {
         if (!favoritado) {
@@ -99,78 +82,100 @@ export default function Card({ jogo }: { jogo: Jogo }) {
     }
 
     return (
-        <Pressable onPress={abrirJogo}>
-            <View style={styles.card}>
-                <View style={styles.imgCard}>
-                    <Pressable style={styles.heartButton} onPress={() => { toggleFavorito() }}>
-                        <Svg width="16" height="16" viewBox="0 0 24 24" fill={favoritado ? '#ffffff' : 'none'} stroke="#ffffff" strokeWidth="2">
-                        <Path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                        </Svg>
-                    </Pressable>
-                    <Image source={{ uri: jogo.capa }} style={styles.imagem} contentFit="cover" />
-                </View>
+        <Pressable key={jogo.id} style={styles.card} onPress={() => abrirJogo()}>
+            <View style={styles.imgCard}>
+                <Image source={{ uri: jogo.capa }} style={styles.imagem} contentFit="cover" />
+            </View>
+            
+            <View style={styles.cardInfo}>
                 <Text style={styles.cardTitulo}>{jogo.titulo}</Text>
-                <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-                    <Text style={styles.cardPreco}>R$ {jogo.preco}</Text>
-                    {/* <Text style={styles.cardAvaliacao}>
-                        <Svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                        <Path d="M1.9125 9.5L2.725 5.9875L0 3.625L3.6 3.3125L5 0L6.4 3.3125L10 3.625L7.275 5.9875L8.0875 9.5L5 7.6375L1.9125 9.5V9.5" fill="#ffffff"/>
-                        </Svg>{' '}
-                        {jogo.avaliacao}
-                    </Text> */}
+                <View style={styles.categoriasRow}>
+                <Text style={styles.categoriaText}>{jogo.genero}</Text>
                 </View>
             </View>
+            
+            <Pressable style={styles.heartButton} onPress={() => toggleFavorito()}>
+                <Svg width="16" height="16" viewBox="0 0 24 24" fill={favoritado ? '#ffffff' : 'none'} stroke="#ffffff" strokeWidth="2">
+                    <Path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                </Svg>
+            </Pressable>
+            
+            <Pressable style={styles.jogarButton} onPress={() => { Alert.alert('Download', 'Iniciando download...') }}>
+                <Svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                    <Polygon points="2,1 9,5 2,9" fill="#0A0D13" />
+                </Svg>
+                <Text style={styles.jogarText}>JOGAR</Text>
+            </Pressable>
         </Pressable>
     );
 }
 
 const styles = StyleSheet.create({
-  card: {
+    card: {
     backgroundColor: '#191C22',
-    height: 300,
-    width: 165,
     borderRadius: 16,
-    
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    gap: 12,
   },
   imgCard: {
-    position: 'relative',
-    height: 200,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    width: 64,
+    height: 64,
+    borderRadius: 10,
     overflow: 'hidden',
   },
   imagem: {
     width: '100%',
     height: '100%',
   },
+  cardInfo: {
+    flex: 1,
+    flexDirection: 'column',
+    gap: 4,
+  },
   cardTitulo: {
     color: '#E1E2EB',
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: '700',
-    margin: 10,
-    textTransform: 'uppercase',
-  },
-  cardPreco: {
-    color: '#A3C9FF',
-    fontSize: 12,
-    fontWeight: '700',
-    margin: 10,
-  },
-  cardAvaliacao: {
-    color: '#A3C9FF',
-    fontSize: 10,
-    fontWeight: '700',
-    margin: 10,
+    letterSpacing: 0.3,
   },
   heartButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    zIndex: 2,
     padding: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    borderRadius: 16,
+  },
+  jogarButton: {
+    backgroundColor: '#A3C9FF',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  jogarText: {
+    color: '#0A0D13',
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+  },
+  categoriasRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: 4,
+  },
+  categoriaText: {
+    color: '#A3C9FF',
+    fontSize: 9,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+  },
+  infoText: {
+    color: '#6B7280',
+    fontSize: 9,
+    letterSpacing: 0.4,
   },
 });
