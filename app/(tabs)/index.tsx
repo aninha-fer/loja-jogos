@@ -2,32 +2,59 @@ import Card from '@/components/card';
 import CarrosselCategorias from '@/components/carrossel-categorias';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import axios from 'axios';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Svg, { Polygon } from 'react-native-svg';
 
+type Jogo = {
+  titulo: string;
+  descricao: string;
+  preco: number;
+  genero: string;
+  dataLancamento: string;
+  tamanho: number;
+  capa: string;
+  idadeMinima: number;
+};
+
 export default function HomeScreen() {
-  const router = useRouter();
   const colorScheme = useColorScheme();
-  const categorias = ['Ação', 'RPG', 'Estratégia', 'Terror', 'Aventura', 'Simulação', 'Esporte', 'Corrida', 'Puzzle'];
+  const [data, setData] = useState<Jogo[]>([]);
+
+  const categorias = ['acao', 'RPG', 'sobrevivencia', 'aventura', 'esporte'];
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await axios.get('https://projeto-steam.vercel.app/jogos');
+        setData(response.data); 
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    fetchData();
+  }, []);
+
   const jogo = {
     titulo: 'Minecraft',
     preco: 'R$ 199,90',
     avaliacao: '4.9',
     descricao: 'Minecraft é um jogo de construção e aventura onde os jogadores podem explorar um mundo, coletar recursos, construir estruturas e enfrentar criaturas.',
-    imagem: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6DKnP8m8EHbfT7f5L6ixqAvHiHQxxhFtkZg&s',
+    capa: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6DKnP8m8EHbfT7f5L6ixqAvHiHQxxhFtkZg&s',
   };
   return (
     <ScrollView style={[styles.container, { backgroundColor: Colors[colorScheme ?? 'light'].background, flex: 1 }]} contentContainerStyle={{ paddingBottom: 100 }}> 
       <View style={styles.destaqueSemana}>
-        <Image source={{ uri: jogo.imagem }} style={styles.destaqueImagem} contentFit="cover" />
+        <Image source={{ uri: jogo.capa }} style={styles.destaqueImagem} contentFit="cover" />
         <View style={styles.destaqueOverlay} />
         <View style={styles.destaqueContent}>
           <Text style={styles.tituloDestaque}>Destaque da Semana</Text>
           <Text style={styles.titulo}>{jogo.titulo}</Text>
           <Text style={styles.descricao}>{jogo.descricao}</Text>
-          <Pressable style={styles.jogarButton} onPress={() => { /* ação jogar */ }}>
+          <Pressable style={styles.jogarButton} onPress={() => { Alert.alert('Download', 'Iniciando download...') }}>
             <Svg width="10" height="10" viewBox="0 0 10 10" fill="none">
               <Polygon points="2,1 9,5 2,9" fill="#002A51" />
             </Svg>
@@ -41,7 +68,9 @@ export default function HomeScreen() {
         <Text style={styles.subtitulo}>Tendências globais hoje</Text>
       </View>
       <View style={styles.gridCards}>
-        <Card jogo={jogo}/>
+        {data.map((jogo, index) => (
+          <Card key={index} jogo={jogo} />
+        ))}
       </View>
     </ScrollView>
   );
